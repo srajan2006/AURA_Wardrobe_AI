@@ -101,3 +101,17 @@ if os.path.exists("wardrobe_db.csv"):
                     st.image(img_path, caption=caption, width="stretch")
 else:
     st.info("Your wardrobe is empty. Add some clothes!")
+
+st.markdown("---")
+st.header("🛠 Admin Panel (All Users)")
+
+if st.session_state.user == "admin":  # Only visible to you
+    if os.path.exists("wardrobe_db.csv"):
+        df = pd.read_csv("wardrobe_db.csv")
+        st.dataframe(df)
+
+        for _, row in df.iterrows():
+            if os.path.exists(row["image_path"]):
+                st.image(row["image_path"], caption=f"{row['user_id']} - {row['color']} {row['category']}", width="stretch")
+    else:
+        st.info("No data yet.")
