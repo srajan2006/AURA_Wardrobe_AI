@@ -5,7 +5,9 @@ import uuid
 from step8_aura_stylist import predict_garment  # reuse model
 
 WARDROBE_DB = "wardrobe_db.csv"
-WARDROBE_ROOT = "wardrobe/user1"
+import streamlit as st
+WARDROBE_ROOT = f"wardrobe/{st.session_state.user}"
+
 
 os.makedirs(WARDROBE_ROOT, exist_ok=True)
 
@@ -24,11 +26,12 @@ def add_to_wardrobe(img_path, color):
 
     # Save to database
     record = {
-        "user_id": "user1",
+        "user_id": st.session_state.user,
         "image_path": new_path,
         "category": category,
         "color": color
     }
+
 
     if os.path.exists(WARDROBE_DB):
         df = pd.read_csv(WARDROBE_DB)

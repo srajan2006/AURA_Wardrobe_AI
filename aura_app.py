@@ -4,6 +4,26 @@ import os
 from step9_wardrobe_manager import add_to_wardrobe
 from step8_aura_stylist import recommend_outfit, predict_garment, predict_color
 
+# ================= USER LOGIN =================
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+st.sidebar.title("🔐 User Login")
+username = st.sidebar.text_input("Enter username")
+
+if st.sidebar.button("Login"):
+    if username.strip():
+        st.session_state.user = username.strip()
+        st.sidebar.success(f"Logged in as {st.session_state.user}")
+    else:
+        st.sidebar.warning("Please enter a username")
+
+# Block app until logged in
+if st.session_state.user is None:
+    st.warning("Please login to access your wardrobe.")
+    st.stop()
+
+
 st.title("👗 AURA Virtual Wardrobe")
 
 # ================= UPLOAD SECTION =================
@@ -54,6 +74,8 @@ st.header("🗂 My Wardrobe")
 
 if os.path.exists("wardrobe_db.csv"):
     df = pd.read_csv("wardrobe_db.csv")
+    df = df[df["user_id"] == st.session_state.user]
+
 
     filter_cat = st.selectbox(
         "Filter by category",
