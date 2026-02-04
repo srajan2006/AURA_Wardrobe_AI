@@ -102,16 +102,29 @@ if os.path.exists("wardrobe_db.csv"):
 else:
     st.info("Your wardrobe is empty. Add some clothes!")
 
+#Admin panel
 st.markdown("---")
 st.header("🛠 Admin Panel (All Users)")
 
-if st.session_state.user == "admin":  # Only visible to you
+if st.session_state.user == "admin":
     if os.path.exists("wardrobe_db.csv"):
         df = pd.read_csv("wardrobe_db.csv")
+
+        st.subheader("📋 Database Records")
         st.dataframe(df)
 
-        for _, row in df.iterrows():
-            if os.path.exists(row["image_path"]):
-                st.image(row["image_path"], caption=f"{row['user_id']} - {row['color']} {row['category']}", width="stretch")
+        st.subheader("🖼 Uploaded Images")
+
+        cols = st.columns(3)
+        for idx, row in df.iterrows():
+            img_path = row["image_path"]
+            caption = f"{row['user_id']} — {row['color']} {row['category']}"
+
+            if os.path.exists(img_path):
+                with cols[idx % 3]:
+                    st.image(img_path, caption=caption, width="stretch")
+            else:
+                with cols[idx % 3]:
+                    st.warning("Image not found")
     else:
-        st.info("No data yet.")
+        st.info("No wardrobe data yet.")
