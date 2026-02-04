@@ -116,15 +116,20 @@ if st.session_state.user == "admin":
         st.subheader("🖼 Uploaded Images")
 
         cols = st.columns(3)
+
         for idx, row in df.iterrows():
             img_path = row["image_path"]
+
+            # FIX: Convert Windows path → Linux path
+            img_path = img_path.replace("\\", "/")
+
             caption = f"{row['user_id']} — {row['color']} {row['category']}"
 
-            if os.path.exists(img_path):
-                with cols[idx % 3]:
+            with cols[idx % 3]:
+                if os.path.exists(img_path):
                     st.image(img_path, caption=caption, width="stretch")
-            else:
-                with cols[idx % 3]:
+                else:
                     st.warning("Image not found")
+
     else:
         st.info("No wardrobe data yet.")

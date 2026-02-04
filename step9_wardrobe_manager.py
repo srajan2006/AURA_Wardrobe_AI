@@ -13,7 +13,7 @@ def add_to_wardrobe(img_path, color, user, category):
     os.makedirs(cat_folder, exist_ok=True)
 
     new_name = f"{uuid.uuid4().hex}.jpg"
-    new_path = os.path.join(cat_folder, new_name)
+    new_path = os.path.join(cat_folder, new_name).replace("\\", "/")
 
     shutil.copy(img_path, new_path)
 
