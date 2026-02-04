@@ -23,7 +23,6 @@ if st.session_state.user is None:
     st.warning("Please login to access your wardrobe.")
     st.stop()
 
-
 st.title("👗 AURA Virtual Wardrobe")
 
 # ================= UPLOAD SECTION =================
@@ -41,24 +40,25 @@ if uploaded_file:
 
     st.markdown("### ✏️ Correct if AI is wrong")
 
+    category_options = ["shirt", "tshirt", "jeans", "jacket"]
+    color_options = ["black", "white", "grey", "blue", "red", "green", "yellow", "brown"]
+
     category = st.selectbox(
         "Select Garment Type",
-        ["shirt", "tshirt", "jeans", "jacket"],
-        index=["shirt", "tshirt", "jeans", "jacket"].index(predicted_category)
+        category_options,
+        index=category_options.index(predicted_category) if predicted_category in category_options else 0
     )
 
     color = st.selectbox(
         "Select Color",
-        ["black", "white", "grey", "blue", "red", "green", "yellow", "brown"],
-        index=["black", "white", "grey", "blue", "red", "green", "yellow", "brown"].index(predicted_color)
-        if predicted_color in ["black", "white", "grey", "blue", "red", "green", "yellow", "brown"]
-        else 0
+        color_options,
+        index=color_options.index(predicted_color) if predicted_color in color_options else 0
     )
 
     st.info(f"Final Selection → **{color} {category}**")
 
     if st.button("Add to Wardrobe"):
-        add_to_wardrobe("temp.jpg", color)
+        add_to_wardrobe("temp.jpg", color, st.session_state.user, category)
         st.success("Item added to wardrobe!")
 
     if st.button("Get Outfit Suggestions"):
@@ -68,26 +68,28 @@ if uploaded_file:
             st.write("•", item)
 
 # ================= WARDROBE VIEWER =================
-
 st.markdown("---")
 st.header("🗂 My Wardrobe")
 
 if os.path.exists("wardrobe_db.csv"):
     df = pd.read_csv("wardrobe_db.csv")
-    df = df[df["user_id"] == st.session_state.user]
 
-
-    filter_cat = st.selectbox(
-        "Filter by category",
-        ["All"] + sorted(df["category"].unique().tolist())
-    )
-
-    if filter_cat != "All":
-        df = df[df["category"] == filter_cat]
+    if "user_id" in df.columns:
+        df = df[df["user_id"] == st.session_state.user]
+    else:
+        df = pd.DataFrame()
 
     if df.empty:
-        st.info("No items in this category yet.")
+        st.info("Your wardrobe is empty. Add some clothes!")
     else:
+        filter_cat = st.selectbox(
+            "Filter by category",
+            ["All"] + sorted(df["category"].unique().tolist())
+        )
+
+        if filter_cat != "All":
+            df = df[df["category"] == filter_cat]
+
         cols = st.columns(3)
 
         for idx, row in df.iterrows():
@@ -97,6 +99,5 @@ if os.path.exists("wardrobe_db.csv"):
             if os.path.exists(img_path):
                 with cols[idx % 3]:
                     st.image(img_path, caption=caption, width="stretch")
-
 else:
     st.info("Your wardrobe is empty. Add some clothes!")
