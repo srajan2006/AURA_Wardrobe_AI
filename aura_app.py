@@ -103,26 +103,19 @@ else:
     st.info("Your wardrobe is empty. Add some clothes!")
 
 #Admin panel
-st.markdown("---")
-st.header("🛠 Admin Panel (All Users)")
-
 if st.session_state.user == "admin":
+    st.markdown("---")
+    st.header("🛠 Admin Panel (All Users)")
+
     if os.path.exists("wardrobe_db.csv"):
         df = pd.read_csv("wardrobe_db.csv")
-
-        st.subheader("📋 Database Records")
         st.dataframe(df)
 
         st.subheader("🖼 Uploaded Images")
 
         cols = st.columns(3)
-
         for idx, row in df.iterrows():
-            img_path = row["image_path"]
-
-            # FIX: Convert Windows path → Linux path
-            img_path = img_path.replace("\\", "/")
-
+            img_path = row["image_path"].replace("\\", "/")
             caption = f"{row['user_id']} — {row['color']} {row['category']}"
 
             with cols[idx % 3]:
@@ -130,6 +123,3 @@ if st.session_state.user == "admin":
                     st.image(img_path, caption=caption, width="stretch")
                 else:
                     st.warning("Image not found")
-
-    else:
-        st.info("No wardrobe data yet.")
